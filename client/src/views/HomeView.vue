@@ -14,4 +14,14 @@
 
 <style scoped>
 
+.title {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
 </style>

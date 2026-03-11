@@ -1,10 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '../views/LoginView.vue'
 import HomeView from '../views/HomeView.vue'
-import LogActivityView from '../views/LogActivityView.vue'
-import AdminView from '../views/AdminView.vue'
-import FriendView from '../views/FriendView.vue'
-import MoreStatsView from '../views/MoreStatsView.vue'
 
 
 const router = createRouter({
@@ -38,6 +33,11 @@ const router = createRouter({
       name: 'more-stats',
       component: () => import('../views/MoreStatsView.vue'),
     },
+    {
+      path: '/LoginView',
+      name: 'login',
+      component: () => import('../views/LoginView.vue'),
+    }
   ],
 })
 
