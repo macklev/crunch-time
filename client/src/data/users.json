@@ -1,0 +1,36 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "username": "john_doe",
+            "gender": "male",
+            "age": 25,
+            "profilePicture": "https://media.istockphoto.com/id/1392528328/photo/portrait-of-smiling-handsome-man-in-white-t-shirt-standing-with-crossed-arms.jpg?s=612x612&w=0&k=20&c=6vUtfKvHhNsK9kdNWb7EJlksBDhBBok1bNjNRULsAYs=",
+            "admin": false
+        },
+        {
+            "id": 2,
+            "username": "mack_levitt",
+            "gender": "female",
+            "age": 22,
+            "profilePicture": "https://media.licdn.com/dms/image/v2/D4E03AQE3EPP_2CD8cw/profile-displayphoto-scale_200_200/B4EZiw1E8xGwAY-/0/1755313362102?e=2147483647&v=beta&t=OpZ9lx0WQLwOESHXLQa-P-gcGYUHRl9R0h0yrIeF_Jo",
+            "admin": true
+        },
+        {
+            "id": 3,
+            "username": "jane_smith",
+            "gender": "female",
+            "age": 30,
+            "profilePicture": "https://media.istockphoto.com/id/1454026690/photo/portrait-of-female-volleyball-player-holding-a-volleyball-ball-at-sports-court.jpg?s=612x612&w=0&k=20&c=h8FYR3jvBj7k-clbvJf1bCLWkpg_5uO66QPHk-mp6ic=",
+            "admin": false
+        },
+        {
+            "id": 4,
+            "username": "taylor_swift",
+            "gender":"female",
+            "age": 35,
+            "profilePicture":"https://upload.wikimedia.org/wikipedia/en/thumb/d/d6/Taylor_Swift_The_Eras_Tour_film_promotional_poster.png/250px-Taylor_Swift_The_Eras_Tour_film_promotional_poster.png",
+            "admin":false
+        }
+    ]
+}
