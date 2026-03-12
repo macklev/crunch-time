@@ -21,7 +21,7 @@ function selectUser(user: User) {
 <template>
 <div>
 
-<nav class="navbar is-info" role="navigation" aria-label="main navigation">
+<nav class="navbar is-warning" role="navigation" aria-label="main navigation">
 
   <div class="navbar-brand">
 

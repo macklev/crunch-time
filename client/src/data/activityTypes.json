@@ -29,6 +29,12 @@
             "name": "Yoga",
             "description": "A mind-body practice that combines physical postures, breathing exercises, and meditation.",
             "caloriesBurnedPerHour": 200
+        },
+        {
+            "id": 6,
+            "name": "Cardio",
+            "description": "A type of exercise that raises your heart rate and improves cardiovascular health.",
+            "caloriesBurnedPerHour": 500
         }
     ]
 }
