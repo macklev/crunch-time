@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { useUserStore } from '@/stores/userStore';
 
+const userStore = useUserStore();
 </script>
 
 <template>
@@ -7,7 +9,7 @@
     <h1 class="title">Crunch Time</h1>
     <h2 class="subtitle">Your Fitness, Connected</h2>
     <main>
-      <h1>Welcome to Your App</h1>
+      <h1>Welcome back, {{ userStore.currentUser?.username }} </h1>
     </main>
   </div>
 </template>

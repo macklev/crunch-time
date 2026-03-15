@@ -41,6 +41,7 @@ function submitActivity() {
             </option>
           </select>
         </div>
+      </div>
     </div>
     <div class="field">
       <label class="label">Duration (minutes)</label>
@@ -48,7 +49,7 @@ function submitActivity() {
         <input
           type="number"
           class="input"
-          v-model="duration"
+          v-model.number="duration"
           placeholder="Enter duration"
         />
       </div>
@@ -70,7 +71,6 @@ function submitActivity() {
         </button>
       </div>
     </div>
-  </div>
   </div>
 </template>
 

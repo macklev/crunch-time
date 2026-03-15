@@ -32,11 +32,6 @@ const router = createRouter({
       path: '/MoreStatsView',
       name: 'more-stats',
       component: () => import('../views/MoreStatsView.vue'),
-    },
-    {
-      path: '/LoginView',
-      name: 'login',
-      component: () => import('../views/LoginView.vue'),
     }
   ],
 })
