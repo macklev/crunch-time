@@ -26,7 +26,7 @@ function selectUser(user: User) {
   <div class="navbar-brand">
 
     <a class="navbar-item">
-      <img src="/logo.png" width="30" height="30" />
+      <img alt= "a pink clock" src="/logo.png" width="30" height="30" />
     </a>
 
     <a
@@ -75,9 +75,16 @@ function selectUser(user: User) {
     <!-- RIGHT SIDE -->
     <div class="navbar-end">
 
+
       <div class="navbar-item has-dropdown is-hoverable">
 
         <a class="navbar-link">
+          <img
+            v-if="userStore.currentUser?.profilePicture"
+            :src="userStore.currentUser.profilePicture"
+            :alt="userStore.currentUser.username"
+            class="profile-avatar"
+          />
           {{ userStore.currentUser ? userStore.currentUser.username : "Select User" }}
         </a>
 
@@ -89,6 +96,11 @@ function selectUser(user: User) {
             :key="user.id"
             @click="selectUser(user)"
           >
+            <img
+              :src="user.profilePicture"
+              :alt="user.username"
+              class="profile-avatar-small"
+            />
             {{ user.username }}
           </a>
 
@@ -108,5 +120,23 @@ function selectUser(user: User) {
 <style scoped>
 .logo {
   max-height: 30px;
+}
+
+.profile-avatar {
+  width: 40px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.profile-avatar-small {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
 }
 </style>
