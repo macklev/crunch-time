@@ -66,7 +66,7 @@ function submitActivity() {
     </div>
     <div class="field">
       <div class="control">
-        <button class="button is-primary" @click="submitActivity">
+        <button class="button" @click="submitActivity">
           Submit Activity
         </button>
       </div>

@@ -1,10 +1,125 @@
 @import '@fortawesome/fontawesome-free/css/all.css';
 @import 'bulma/css/bulma.css';
+@import url('https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap');
 
 
-.abril-fatface-regular {
-  font-family: "Abril Fatface", serif;
-  font-weight: 400;
-  font-style: normal;
+:root {
+  --primary-color: #f98805;
+  --secondary-color: #fdb462;
+  --hot-pink: #f35695;
+  --light-pink: #f8dbdb;
+  --dark-green: #264414;
+  --light-green: #dde255;
 }
 
+.navbar {
+  background-color: var(--primary-color);
+}
+
+.navbar-item {
+  color: white;
+}
+
+.navbar-item:hover {
+  background-color: var(--secondary-color);
+  color: var(--dark-green);
+}
+
+.navbar-item.is-active {
+  background-color: var(--secondary-color);
+  color: var(--dark-green);
+}
+
+.navbar-dropdown {
+  background-color: var(--light-green);
+}
+
+.navbar-dropdown .navbar-item {
+  color: var(--dark-green);
+}
+
+.navbar-dropdown .navbar-item:hover {
+  background-color: var(--secondary-color);
+}
+
+.navbar-end {
+  background-color: var(--primary-color);
+}
+
+.title {
+  color: var(--dark-green);
+}
+
+.subtitle {
+  color: var(--dark-green);
+}
+
+html, body {
+  font-family: "Racing Sans One", cursive;
+  background-color: var(--light-pink);
+  color: var(--hot-pink);
+}
+
+
+.section {
+  background-color: var(--light-pink);
+  min-height: 100vh;
+}
+
+.container {
+  background-color: var(--light-pink);
+  max-width: 900px;
+  margin: auto;
+}
+
+.box {
+  background-color: var(--light-green);
+  color: var(--dark-green);
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.box:hover {
+  transform: translateY(-3px);
+}
+
+.button {
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background-color: var(--secondary-color);
+  color: var(--dark-green);
+  transform: scale(1.03);
+}
+
+.control .button {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.select select {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.level {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--dark-green);
+}
+
+.level:last-child {
+  border-bottom: none;
+}
+
+.input {
+  background-color: white;
+  color: var(--dark-green);
+}
