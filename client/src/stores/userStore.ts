@@ -12,9 +12,47 @@ export const useUserStore = defineStore('user', () => {
     currentUser.value = selectedUser
   }
 
+  function updateUser(userId: number, updates: Partial<Omit<User, 'id'>>) {
+    const index = users.value.findIndex((user) => user.id === userId)
+    if (index === -1) return
+
+    const existingUser = users.value[index]
+    if (!existingUser) return
+
+    const updatedUser: User = {
+      ...existingUser,
+      ...updates,
+      id: userId,
+    }
+
+    users.value[index] = updatedUser
+
+    if (currentUser.value?.id === userId) {
+      currentUser.value = updatedUser
+    }
+  }
+
+  function addUser(newUser: Omit<User, 'id'>) {
+    const newId = users.value.length > 0 ? Math.max(...users.value.map((u) => u.id)) + 1 : 1
+    const userToAdd: User = { id: newId, ...newUser }
+    users.value.push(userToAdd)
+    return userToAdd
+  }
+
+  function deleteUser(userId: number) {
+    users.value = users.value.filter((user) => user.id !== userId)
+
+    if (currentUser.value?.id === userId) {
+      currentUser.value = null
+    }
+  }
+
   return {
     users,
     currentUser,
-    setUser
+    setUser,
+    updateUser,
+    deleteUser,
+    addUser
   }
 })

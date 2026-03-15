@@ -51,6 +51,7 @@ const mostFrequentActivity = computed(() => {
 <template>
   <div class="box">
     <h2 class="title is-4">My Statistics</h2>
+    <div class="stats-box">
     <p class="box">Total Duration of Workouts: {{ totalDuration }} minutes</p>
     <hr>
     <p class="box">Total Calories Burned: {{ Math.round(totalCalories) }} calories</p>
@@ -60,6 +61,7 @@ const mostFrequentActivity = computed(() => {
     <p class="box">Most Frequent Activity Type: {{ mostFrequentActivity }}</p>
     <hr>
     <ActivityList />
+    </div>
   </div>
 </template>
 
