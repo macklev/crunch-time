@@ -14,7 +14,6 @@ export const useActivityStore = defineStore('activity', () => {
 
 
   function addActivity(type: string, duration: number, date: string) {
-
   if (!userStore.currentUser) {
     console.error('No user selected')
     return
