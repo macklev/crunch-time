@@ -172,6 +172,3 @@ function addNewUser() {
 
 </template>
 
-<style scoped>
-
-</style>
