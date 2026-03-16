@@ -10,7 +10,3 @@ import ActivityList from '@/components/ActivityList.vue';
     <ActivityList />
   </div>
 </template>
-
-<style scoped>
-
-</style>

@@ -9,6 +9,3 @@ import FullStatistics from '@/components/FullStatistics.vue';
   </div>
 </template>
 
-<style scoped>
-
-</style>

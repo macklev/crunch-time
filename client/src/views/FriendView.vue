@@ -40,7 +40,3 @@ function getUsername(userId: number) {
   </div>
 </template>
 
-
-<style scoped>
-
-</style>
