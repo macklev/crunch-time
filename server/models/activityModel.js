@@ -21,10 +21,10 @@ export async function create(activity) {
   return data[0]
 }
 
-export async function update(id, updates) {
+export async function update(id, activity) {
   const { data, error } = await supabase
     .from('activities')
-    .update(updates)
+    .update(activity)
     .eq('id', id)
     .select()
 

@@ -46,10 +46,24 @@ export const useActivityStore = defineStore('activity', () => {
 
   function editActivity(updatedActivity: (typeof activities.value)[number]){
     const index= activities.value.findIndex(activity => activity.id === updatedActivity.id)
+
     if (index !== -1) {
       activities.value[index] = updatedActivity
     }
   }
+
+  async function fetchActivities() {
+  const response = await fetch('http://localhost:3000/api/activities')
+
+  if (!response.ok) {
+    console.error('Failed to fetch activities')
+    return
+  }
+
+  const data = await response.json()
+
+  activities.value = data
+}
 
   return {
     activities,
@@ -57,5 +71,6 @@ export const useActivityStore = defineStore('activity', () => {
     addActivity,
     deleteActivity,
     editActivity,
+    fetchActivities
   }
 })

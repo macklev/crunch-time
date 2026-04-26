@@ -20,7 +20,10 @@ export async function createActivity(req, res) {
 
 export async function updateActivity(req, res) {
   try {
-    const updatedActivity = await activityModel.update(req.params.id, req.body)
+    const id = Number(req.params.id)
+
+    const updatedActivity = await activityModel.update(id, req.body)
+    
     res.json(updatedActivity)
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -29,8 +32,10 @@ export async function updateActivity(req, res) {
 
 export async function deleteActivity(req, res) {
   try {
-    const deletedActivity = await activityModel.remove(req.params.id)
-    res.json(deletedActivity)
+    const id= Number(req.params.id)
+
+    await activityModel.remove(id)
+    res.json({ message: 'Activity deleted' })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
