@@ -2,20 +2,61 @@
 
 import { ref } from 'vue'
 import { useActivityStore } from '@/stores/activityStore'
+import { useUserStore } from '@/stores/userStore'
 
 const activityStore = useActivityStore()
+const userStore = useUserStore()
 
 const selectedType = ref('')
 const duration = ref(0)
 const date = ref('')
+const errorMessage= ref('')
 
-function submitActivity() {
+async function submitActivity() {
+  errorMessage.value = ''
 
-  activityStore.addActivity(
-    selectedType.value,
-    duration.value,
-    date.value
-  )
+  if (!selectedType.value || !duration.value || !date.value) {
+    errorMessage.value = 'Please fill in all fields'
+    return
+  }
+
+  if (!userStore.currentUser) {
+    errorMessage.value = 'You must be logged in to log an activity'
+    return
+  }
+
+  const activityType= activityStore.activityTypes.find(
+    type => type.name === selectedType.value)
+
+  if (!activityType) {
+    errorMessage.value = 'Selected activity type is invalid'
+    return
+  }
+
+  const caloriesBurned= (activityType.caloriesBurnedPerHour / 60) * duration.value
+
+  const response = await fetch('http://localhost:3000/api/activities', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      userId: userStore.currentUser.id,
+      type: selectedType.value,
+      duration: duration.value,
+      caloriesBurned,
+      date: date.value
+    })
+  })
+
+  if (!response.ok) {
+    errorMessage.value = 'Could not save activity.'
+    return
+  }
+
+  const savedActivity = await response.json()
+
+  activityStore.activities.push(savedActivity)
 
   selectedType.value = ''
   duration.value = 0
@@ -64,6 +105,9 @@ function submitActivity() {
         />
       </div>
     </div>
+    <p v-if="errorMessage" class="has-text-danger">
+      {{ errorMessage }}
+    </p>
     <div class="field">
       <div class="control">
         <button class="button" @click="submitActivity">
