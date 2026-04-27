@@ -69,12 +69,35 @@ async function fetchMyActivities(token: string) {
   activities.value = data
 }
 
+async function fetchActivityTypes(token: string) {
+  const response = await fetch('http://localhost:3000/api/activity-types', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  if (!response.ok) {
+    console.error('Failed to fetch activity types')
+    return
+  }
+
+  activityTypes.value = await response.json()
+}
+
+function refreshActivities() {
+  if (userStore.token) {
+    return fetchMyActivities(userStore.token)
+  }
+}
+
   return {
     activities,
     activityTypes,
     addActivity,
     deleteActivity,
     editActivity,
-    fetchMyActivities
+    fetchMyActivities,
+    fetchActivityTypes,
+    refreshActivities
   }
 })

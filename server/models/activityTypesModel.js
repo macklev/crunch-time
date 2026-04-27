@@ -2,18 +2,19 @@ import supabase from '../db/index.js'
 
 export async function getAll() {
   const { data, error } = await supabase
-    .from('activities')
+    .from('activity_types')
     .select('*')
+    .order('id')
 
   if (error) throw error
 
   return data
 }
 
-export async function create(activity) {
+export async function create(type) {
   const { data, error } = await supabase
-    .from('activities')
-    .insert([activity])
+    .from('activity_types')
+    .insert([type])
     .select()
     .single()
 
@@ -22,34 +23,34 @@ export async function create(activity) {
   return data
 }
 
-export async function update(id, activity) {
+export async function update(id, updates) {
   const { data, error } = await supabase
-    .from('activities')
-    .update(activity)
+    .from('activity_types')
+    .update(updates)
     .eq('id', id)
     .select()
+    .single()
 
   if (error) throw error
 
-  return data[0]
+  return data
 }
 
 export async function remove(id) {
-  const { data, error } = await supabase
-    .from('activities')
+  const { error } = await supabase
+    .from('activity_types')
     .delete()
     .eq('id', id)
 
   if (error) throw error
-
-  return data[0]
 }
 
-export async function getByUserIds(userIds) {
+export async function getById(id) {
   const { data, error } = await supabase
-    .from('activities')
+    .from('activity_types')
     .select('*')
-    .in('userId', userIds)
+    .eq('id', id)
+    .single()
 
   if (error) throw error
 

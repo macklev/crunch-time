@@ -4,7 +4,12 @@ import { ref } from 'vue'
 import usersData from '../data/users.json'
 
 export const useUserStore = defineStore('user', () => {
-  const users = ref<User[]>(usersData.users)
+  const users = ref<User[]>(
+    usersData.users.map((user) => ({
+      ...user,
+      friends: [],
+    }))
+  )
 
   const currentUser = ref<User | null>(null)
 

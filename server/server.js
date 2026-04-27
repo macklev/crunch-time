@@ -4,10 +4,14 @@ import dotenv from 'dotenv'
 import activityRoutes from './routes/activityRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import activityTypesRoutes from './routes/activityTypesRoutes.js'
 
 dotenv.config()
 
 const app = express()
+
+app.use(express.json())
+app.use(cors())
 
 app.use(cors({
   origin: 'http://localhost:5173',
@@ -19,9 +23,10 @@ app.use('/api/users', userRoutes)
 app.use('/api/auth', authRoutes)
 
 app.use(cors())
-app.use(express.json())
+
 
 app.use('/api/activities', activityRoutes)
+app.use('/api/activity-types', activityTypesRoutes)
 
 app.get('/', (req, res) => {
   res.send('API is running')

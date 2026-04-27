@@ -11,6 +11,7 @@ const userStore = useUserStore();
 onMounted(() => {
   if(userStore.token) {
     activityStore.fetchMyActivities(userStore.token);
+    activityStore.fetchActivityTypes(userStore.token);
     }
   });
 </script>
