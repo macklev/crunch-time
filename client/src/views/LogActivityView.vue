@@ -3,12 +3,16 @@ import { onMounted } from 'vue';
 import ActivityForm from '@/components/ActivityForm.vue';
 import ActivityList from '@/components/ActivityList.vue';
 import { useActivityStore } from '@/stores/activityStore';
+import { useUserStore } from '@/stores/userStore';
 
 const activityStore = useActivityStore();
+const userStore = useUserStore();
 
 onMounted(() => {
-  activityStore.fetchActivities();
-});
+  if(userStore.token) {
+    activityStore.fetchMyActivities(userStore.token);
+    }
+  });
 </script>
 
 <template>

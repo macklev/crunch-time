@@ -52,16 +52,20 @@ export const useActivityStore = defineStore('activity', () => {
     }
   }
 
-  async function fetchActivities() {
-  const response = await fetch('http://localhost:3000/api/activities')
+
+async function fetchMyActivities(token: string) {
+  const response = await fetch('http://localhost:3000/api/activities/me', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
 
   if (!response.ok) {
-    console.error('Failed to fetch activities')
+    console.error('Failed to fetch my activities')
     return
   }
 
   const data = await response.json()
-
   activities.value = data
 }
 
@@ -71,6 +75,6 @@ export const useActivityStore = defineStore('activity', () => {
     addActivity,
     deleteActivity,
     editActivity,
-    fetchActivities
+    fetchMyActivities
   }
 })

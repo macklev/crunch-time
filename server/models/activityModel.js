@@ -43,3 +43,14 @@ export async function remove(id) {
 
   return data[0]
 }
+
+export async function getByUserId(userId) {
+  const { data, error } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('userId', userId)
+
+  if (error) throw error
+
+  return data
+}

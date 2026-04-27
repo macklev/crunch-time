@@ -37,7 +37,7 @@ export async function googleCallback(req, res) {
             profilePicture: payload.picture
         }
 
-        const user = await userModel.findOrCreate(googleUser)
+        const user = await userModel.findOrCreateGoogleUser(googleUser)
 
         const appToken= jwt.sign(
             {

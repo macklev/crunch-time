@@ -41,7 +41,6 @@ async function submitActivity() {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      userId: userStore.currentUser.id,
       type: selectedType.value,
       duration: duration.value,
       caloriesBurned,
