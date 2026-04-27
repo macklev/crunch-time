@@ -4,13 +4,32 @@ import { ref } from 'vue'
 import usersData from '../data/users.json'
 
 export const useUserStore = defineStore('user', () => {
-  const users = ref<User[]>(usersData.users)
+  const users = ref<User[]>(
+    usersData.users.map((user) => ({
+      ...user,
+      friends: [],
+    }))
+  )
 
   const currentUser = ref<User | null>(null)
+
+  const token = ref(localStorage.getItem('token') || '')
 
   function setUser(selectedUser: User) {
     currentUser.value = selectedUser
   }
+
+  function setToken(newToken: string) {
+  token.value = newToken
+  localStorage.setItem('token', newToken)
+}
+
+  function logout() {
+  currentUser.value = null
+  token.value = ''
+  localStorage.removeItem('token')
+}
+
 
   function updateUser(userId: number, updates: Partial<Omit<User, 'id'>>) {
     const index = users.value.findIndex((user) => user.id === userId)
@@ -50,9 +69,12 @@ export const useUserStore = defineStore('user', () => {
   return {
     users,
     currentUser,
+    token,
     setUser,
+    setToken,
     updateUser,
     deleteUser,
-    addUser
+    addUser,
+    logout
   }
 })

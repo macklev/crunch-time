@@ -1,67 +1,83 @@
 <script setup lang="ts">
-import { useUserStore } from '@/stores/userStore';
-import { useActivityStore } from '@/stores/activityStore';
-import { computed } from 'vue';
-import ActivityList from './ActivityList.vue';
+import { onMounted, ref } from 'vue'
+import { useUserStore } from '@/stores/userStore'
+import ActivityList from './ActivityList.vue'
 
-const activityStore = useActivityStore();
-const userStore = useUserStore();
+const userStore = useUserStore()
 
-const userActivities = computed(() => {
-  if (!userStore.currentUser) return []
+const stats = ref({
+  totalActivities: 0,
+  totalMinutes: 0,
+  totalCalories: 0,
+  averageDuration: 0,
+  mostCommonActivity: 'N/A'
+})
 
-  return activityStore.activities.filter(
-    activity => activity.userId === userStore.currentUser!.id
-  )
-});
+const errorMessage = ref('')
+const isLoading = ref(false)
 
-const totalDuration = computed(() => {
-  return userActivities.value.reduce((sum, activity) => sum + activity.duration, 0);
-});
+async function fetchStats() {
+  errorMessage.value = ''
+  isLoading.value = true
 
-const totalCalories = computed(() => {
-  return userActivities.value.reduce((sum, activity) => sum + activity.caloriesBurned, 0);
-});
-
-const averageCalories = computed(() => {
-  if (userActivities.value.length === 0) return 0;
-  return totalCalories.value / userActivities.value.length;
-});
-
-const mostFrequentActivity = computed(() => {
-  const activityCount: Record<string, number> = {};
-  userActivities.value.forEach(activity => {
-    activityCount[activity.type] = (activityCount[activity.type] || 0) + 1;
-  });
-
-  let maxCount = 0;
-  let frequentActivity = '';
-  for (const activityType in activityCount) {
-    const count = activityCount[activityType] ?? 0;
-    if (count > maxCount) {
-      maxCount = count;
-      frequentActivity = activityType;
+  const response = await fetch('http://localhost:3000/api/activities/stats', {
+    headers: {
+      Authorization: `Bearer ${userStore.token}`
     }
-  }
-  return frequentActivity || 'N/A';
-});
+  })
 
+  if (!response.ok) {
+    errorMessage.value = 'Could not load statistics.'
+    isLoading.value = false
+    return
+  }
+
+  stats.value = await response.json()
+  isLoading.value = false
+}
+
+onMounted(() => {
+  fetchStats()
+
+  // Listen for when a new activity is added
+  window.addEventListener('activityAdded', fetchStats)
+})
 </script>
 
 <template>
   <div class="box">
     <h2 class="title is-4">My Statistics</h2>
-    <div class="stats-box">
-    <p class="box">Total Duration of Workouts: {{ totalDuration }} minutes</p>
-    <hr>
-    <p class="box">Total Calories Burned: {{ Math.round(totalCalories) }} calories</p>
-    <hr>
-    <p class="box">Average Calories Burned per Activity: {{ Math.round(averageCalories) }} calories</p>
-    <hr>
-    <p class="box">Most Frequent Activity Type: {{ mostFrequentActivity }}</p>
-    <hr>
-    <ActivityList />
+
+    <p v-if="isLoading">Loading statistics...</p>
+
+    <p v-if="errorMessage" class="has-text-danger">
+      {{ errorMessage }}
+    </p>
+
+    <div v-if="!isLoading && !errorMessage" class="stats-box">
+      <p class="box">
+        Total Activities: {{ stats.totalActivities }}
+      </p>
+
+      <p class="box">
+        Total Duration of Workouts: {{ stats.totalMinutes }} minutes
+      </p>
+
+      <p class="box">
+        Total Calories Burned: {{ Math.round(stats.totalCalories) }} calories
+      </p>
+
+      <p class="box">
+        Average Workout Duration:
+        {{ Math.round(stats.averageDuration) }} minutes
+      </p>
+
+      <p class="box">
+        Most Frequent Activity Type:
+        {{ stats.mostCommonActivity || 'N/A' }}
+      </p>
+
+      <ActivityList />
     </div>
   </div>
 </template>
-

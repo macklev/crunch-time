@@ -46,10 +46,49 @@ export const useActivityStore = defineStore('activity', () => {
 
   function editActivity(updatedActivity: (typeof activities.value)[number]){
     const index= activities.value.findIndex(activity => activity.id === updatedActivity.id)
+
     if (index !== -1) {
       activities.value[index] = updatedActivity
     }
   }
+
+
+async function fetchMyActivities(token: string) {
+  const response = await fetch('http://localhost:3000/api/activities/me', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  if (!response.ok) {
+    console.error('Failed to fetch my activities')
+    return
+  }
+
+  const data = await response.json()
+  activities.value = data
+}
+
+async function fetchActivityTypes(token: string) {
+  const response = await fetch('http://localhost:3000/api/activity-types', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  if (!response.ok) {
+    console.error('Failed to fetch activity types')
+    return
+  }
+
+  activityTypes.value = await response.json()
+}
+
+function refreshActivities() {
+  if (userStore.token) {
+    return fetchMyActivities(userStore.token)
+  }
+}
 
   return {
     activities,
@@ -57,5 +96,8 @@ export const useActivityStore = defineStore('activity', () => {
     addActivity,
     deleteActivity,
     editActivity,
+    fetchMyActivities,
+    fetchActivityTypes,
+    refreshActivities
   }
 })
