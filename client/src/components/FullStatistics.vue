@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useUserStore } from '@/stores/userStore'
+import { onMounted, ref, watch } from 'vue'
+import { useActivityStore } from '@/stores/activityStore'
 import ActivityList from './ActivityList.vue'
 
-const userStore = useUserStore()
+const activityStore = useActivityStore()
 
 const stats = ref({
   totalActivities: 0,
   totalMinutes: 0,
   totalCalories: 0,
   averageDuration: 0,
-  mostCommonActivity: 'N/A'
+  mostCommonActivity: 'N/A',
 })
 
 const errorMessage = ref('')
@@ -20,28 +20,26 @@ async function fetchStats() {
   errorMessage.value = ''
   isLoading.value = true
 
-  const response = await fetch('http://localhost:3000/api/activities/stats', {
-    headers: {
-      Authorization: `Bearer ${userStore.token}`
-    }
-  })
-
-  if (!response.ok) {
+  try {
+    stats.value = await activityStore.fetchStats()
+  } catch (error) {
+    console.error('Fetch stats error:', error)
     errorMessage.value = 'Could not load statistics.'
+  } finally {
     isLoading.value = false
-    return
   }
-
-  stats.value = await response.json()
-  isLoading.value = false
 }
 
 onMounted(() => {
   fetchStats()
-
-  // Listen for when a new activity is added
-  window.addEventListener('activityAdded', fetchStats)
 })
+
+watch(
+  () => activityStore.activities.length,
+  () => {
+    fetchStats()
+  },
+)
 </script>
 
 <template>
@@ -81,3 +79,6 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+</style>

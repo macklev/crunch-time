@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useUserStore } from '@/stores/userStore'
+import { api } from '@/services/api'
 import type { ActivityType } from '@/types'
-
-const userStore = useUserStore()
 
 const activityTypes = ref<ActivityType[]>([])
 
 const newName = ref('')
 const newCalories = ref(0)
+
 const editingId = ref<number | null>(null)
 const editName = ref('')
 const editCalories = ref(0)
+
 const errorMessage = ref('')
 const isLoading = ref(false)
 
@@ -19,54 +19,39 @@ async function fetchActivityTypes() {
   errorMessage.value = ''
   isLoading.value = true
 
-  const response = await fetch('http://localhost:3000/api/activity-types', {
-    headers: {
-      Authorization: `Bearer ${userStore.token}`
-    }
-  })
-
-  isLoading.value = false
-
-  if (!response.ok) {
+  try {
+    activityTypes.value = await api<ActivityType[]>('/api/activity-types')
+  } catch (error) {
+    console.error('Fetch activity types error:', error)
     errorMessage.value = 'Could not load activity types.'
-    return
+  } finally {
+    isLoading.value = false
   }
-
-  activityTypes.value = await response.json()
 }
 
- async function addActivityType() {
+async function addActivityType() {
   errorMessage.value = ''
 
-  if (!newName.value || newCalories.value <= 0) {
+  if (!newName.value.trim() || newCalories.value <= 0) {
     errorMessage.value = 'Please enter a name and calories per hour.'
     return
   }
 
-  const response = await fetch('http://localhost:3000/api/activity-types', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${userStore.token}`
-    },
-    body: JSON.stringify({
-      name: newName.value,
-      calories_per_hour: newCalories.value
+  try {
+    const createdType = await api<ActivityType>('/api/activity-types', {
+      name: newName.value.trim(),
+      calories_per_hour: newCalories.value,
     })
-  })
 
-  if (!response.ok) {
+    activityTypes.value.push(createdType)
+
+    newName.value = ''
+    newCalories.value = 0
+  } catch (error) {
+    console.error('Add activity type error:', error)
     errorMessage.value = 'Could not add activity type.'
-    return
   }
-
-  const createdType = await response.json()
-  activityTypes.value.push(createdType)
-
-  newName.value = ''
-  newCalories.value = 0
 }
-
 
 function startEdit(type: ActivityType) {
   editingId.value = type.id
@@ -83,57 +68,52 @@ function cancelEdit() {
 async function saveEdit(typeId: number) {
   errorMessage.value = ''
 
-  const response = await fetch(`http://localhost:3000/api/activity-types/${typeId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${userStore.token}`
-    },
-    body: JSON.stringify({
-      name: editName.value,
-      calories_per_hour: editCalories.value
-    })
-  })
-
-  if (!response.ok) {
-    errorMessage.value = 'Could not update activity type.'
+  if (!editName.value.trim() || editCalories.value <= 0) {
+    errorMessage.value = 'Please enter a name and calories per hour.'
     return
   }
 
-  const updatedType = await response.json()
+  try {
+    const updatedType = await api<ActivityType>(
+      `/api/activity-types/${typeId}`,
+      {
+        name: editName.value.trim(),
+        calories_per_hour: editCalories.value,
+      },
+      { method: 'PUT' },
+    )
 
-  const index = activityTypes.value.findIndex((type) => type.id === typeId)
+    const index = activityTypes.value.findIndex((type) => type.id === typeId)
 
-  if (index !== -1) {
-    activityTypes.value[index] = updatedType
+    if (index !== -1) {
+      activityTypes.value[index] = updatedType
+    }
+
+    cancelEdit()
+  } catch (error) {
+    console.error('Update activity type error:', error)
+    errorMessage.value = 'Could not update activity type.'
   }
-
-  cancelEdit()
 }
 
 async function deleteActivityType(typeId: number) {
   errorMessage.value = ''
 
-  const response = await fetch(`http://localhost:3000/api/activity-types/${typeId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${userStore.token}`
-    }
-  })
+  try {
+    await api(`/api/activity-types/${typeId}`, undefined, {
+      method: 'DELETE',
+    })
 
-  if (!response.ok) {
+    activityTypes.value = activityTypes.value.filter((type) => type.id !== typeId)
+  } catch (error) {
+    console.error('Delete activity type error:', error)
     errorMessage.value = 'Could not delete activity type.'
-    return
   }
-
-  activityTypes.value = activityTypes.value.filter((type) => type.id !== typeId)
 }
 
 onMounted(() => {
   fetchActivityTypes()
-
 })
-
 </script>
 
 <template>
@@ -151,23 +131,27 @@ onMounted(() => {
 
       <div class="field">
         <label class="label">Activity Name</label>
-        <input
-          v-model="newName"
-          class="input"
-          type="text"
-          placeholder="Example: Rowing"
-        />
+        <div class="control">
+          <input
+            v-model="newName"
+            class="input"
+            type="text"
+            placeholder="Example: Rowing"
+          />
+        </div>
       </div>
 
       <div class="field">
         <label class="label">Calories Per Hour</label>
-        <input
-          v-model.number="newCalories"
-          class="input"
-          type="number"
-          min="1"
-          placeholder="Example: 450"
-        />
+        <div class="control">
+          <input
+            v-model.number="newCalories"
+            class="input"
+            type="number"
+            min="1"
+            placeholder="Example: 450"
+          />
+        </div>
       </div>
 
       <button class="button" @click="addActivityType">
@@ -208,21 +192,25 @@ onMounted(() => {
       <div v-else>
         <div class="field">
           <label class="label">Activity Name</label>
-          <input
-            v-model="editName"
-            class="input"
-            type="text"
-          />
+          <div class="control">
+            <input
+              v-model="editName"
+              class="input"
+              type="text"
+            />
+          </div>
         </div>
 
         <div class="field">
           <label class="label">Calories Per Hour</label>
-          <input
-            v-model.number="editCalories"
-            class="input"
-            type="number"
-            min="1"
-          />
+          <div class="control">
+            <input
+              v-model.number="editCalories"
+              class="input"
+              type="number"
+              min="1"
+            />
+          </div>
         </div>
 
         <button class="button is-small" @click="saveEdit(type.id)">

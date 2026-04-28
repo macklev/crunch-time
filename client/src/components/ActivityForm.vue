@@ -26,7 +26,7 @@ async function submitActivity() {
   }
 
   const activityType = activityStore.activityTypes.find(
-    (type) => type.name === selectedType.value
+    (type) => type.name === selectedType.value,
   )
 
   if (!activityType) {
@@ -35,42 +35,28 @@ async function submitActivity() {
   }
 
   const caloriesBurned = Math.round(
-    (activityType.caloriesBurnedPerHour / 60) * duration.value
+    (activityType.calories_per_hour / 60) * duration.value,
   )
 
-  isSaving.value = true
+  try {
+    isSaving.value = true
 
-  const response = await fetch('http://localhost:3000/api/activities', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${userStore.token}`,
-    },
-    body: JSON.stringify({
+    await activityStore.createActivity({
       type: selectedType.value,
       duration: duration.value,
       caloriesBurned,
       date: date.value,
-    }),
-  })
+    })
 
-  isSaving.value = false
-
-  if (!response.ok) {
-    const errorText = await response.text()
-    console.error('Save activity error:', errorText)
+    selectedType.value = ''
+    duration.value = 0
+    date.value = ''
+  } catch (error) {
+    console.error('Save activity error:', error)
     errorMessage.value = 'Could not save activity.'
-    return
+  } finally {
+    isSaving.value = false
   }
-
-  await activityStore.fetchMyActivities(userStore.token)
-
-  // Emit event to notify parent to refresh stats
-  window.dispatchEvent(new CustomEvent('activityAdded'))
-
-  selectedType.value = ''
-  duration.value = 0
-  date.value = ''
 }
 </script>
 
@@ -84,6 +70,7 @@ async function submitActivity() {
         <div class="select">
           <select v-model="selectedType">
             <option value="" disabled>Select Activity</option>
+
             <option
               v-for="activity in activityStore.activityTypes"
               :key="activity.id"
@@ -101,8 +88,8 @@ async function submitActivity() {
       <div class="control">
         <input
           v-model.number="duration"
-          type="number"
           class="input"
+          type="number"
           min="1"
           placeholder="Enter duration"
         />
@@ -114,8 +101,8 @@ async function submitActivity() {
       <div class="control">
         <input
           v-model="date"
-          type="date"
           class="input"
+          type="date"
         />
       </div>
     </div>

@@ -6,11 +6,12 @@ import { requireAdmin } from '../middleware/admin.js'
 const router = express.Router()
 
 router.get('/me', authenticateToken, getMe)
+router.get('/search', authenticateToken, searchUsers)
+router.post('/friends', authenticateToken, addFriend)
+router.delete('/friends/:friendId', authenticateToken, removeFriend)
+
 router.get('/', authenticateToken, requireAdmin, getAllUsers)
 router.put('/:id', authenticateToken, requireAdmin, updateUser)
 router.delete('/:id', authenticateToken, requireAdmin, deleteUser)
-router.post('/friends', authenticateToken, addFriend)
-router.delete('/friends/:friendId', authenticateToken, removeFriend)
-router.get('/search', authenticateToken, searchUsers)
 
 export default router

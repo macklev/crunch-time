@@ -5,6 +5,7 @@ import activityRoutes from './routes/activityRoutes.js'
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 import activityTypesRoutes from './routes/activityTypesRoutes.js'
+import messageRoutes from './routes/messageRoutes.js'
 
 dotenv.config()
 
@@ -27,6 +28,7 @@ app.use(cors())
 
 app.use('/api/activities', activityRoutes)
 app.use('/api/activity-types', activityTypesRoutes)
+app.use('/api/messages', messageRoutes)
 
 app.get('/', (req, res) => {
   res.send('API is running')
