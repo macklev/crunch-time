@@ -1,103 +1,77 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import activityTypesData from '../data/activityTypes.json'
-import activitiesData from '../data/activities.json'
-import { useUserStore } from './userStore'
+import type { Activity, ActivityType, ActivityStats } from '@/types'
+import { api } from '@/services/api'
 
 export const useActivityStore = defineStore('activity', () => {
-  const activities = ref(activitiesData.activities)
+  const activities = ref<Activity[]>([])
+  const activityTypes = ref<ActivityType[]>([])
 
-  const activityTypes = ref(activityTypesData.activities)
-
-  const userStore = useUserStore()
-
-
-
-  function addActivity(type: string, duration: number, date: string) {
-  if (!userStore.currentUser) {
-    console.error('No user selected')
-    return
+  async function fetchMyActivities() {
+    activities.value = await api<Activity[]>('/api/activities/me')
   }
 
-  const activityType = activityTypes.value.find(
-    (activityType) => activityType.name.toLowerCase() === type.toLowerCase()
-  )
-
-  if (!activityType) return
-
-  const caloriesBurned =
-    (activityType.caloriesBurnedPerHour / 60) * duration
-
-  const newActivity = {
-    id: activities.value.length + 1,
-    userId: userStore.currentUser!.id,
-    type,
-    duration,
-    caloriesBurned,
-    date
+  async function fetchFriendActivities() {
+    return await api<Activity[]>('/api/activities/friends')
   }
 
-  activities.value.push(newActivity)
-}
-
-  function deleteActivity(id: number){
-    activities.value = activities.value.filter(activity => activity.id !== id)
+  async function fetchActivityTypes() {
+    activityTypes.value = await api<ActivityType[]>('/api/activity-types')
   }
 
-  function editActivity(updatedActivity: (typeof activities.value)[number]){
-    const index= activities.value.findIndex(activity => activity.id === updatedActivity.id)
+  async function createActivity(activityData: {
+    type: string
+    duration: number
+    caloriesBurned: number
+    date: string
+  }) {
+    const newActivity = await api<Activity>('/api/activities', activityData)
+    activities.value.push(newActivity)
+    return newActivity
+  }
+
+  async function updateActivity(id: number, updates: Partial<Activity>) {
+    const updatedActivity = await api<Activity>(
+      `/api/activities/${id}`,
+      updates,
+      { method: 'PUT' },
+    )
+
+    const index = activities.value.findIndex((activity) => activity.id === id)
 
     if (index !== -1) {
       activities.value[index] = updatedActivity
     }
+
+    return updatedActivity
   }
 
+  async function deleteActivity(id: number) {
+    await api(`/api/activities/${id}`, undefined, {
+      method: 'DELETE',
+    })
 
-async function fetchMyActivities(token: string) {
-  const response = await fetch('http://localhost:3000/api/activities/me', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-
-  if (!response.ok) {
-    console.error('Failed to fetch my activities')
-    return
+    activities.value = activities.value.filter((activity) => activity.id !== id)
   }
 
-  const data = await response.json()
-  activities.value = data
-}
-
-async function fetchActivityTypes(token: string) {
-  const response = await fetch('http://localhost:3000/api/activity-types', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-
-  if (!response.ok) {
-    console.error('Failed to fetch activity types')
-    return
+  function clearActivities() {
+  activities.value = []
   }
 
-  activityTypes.value = await response.json()
-}
-
-function refreshActivities() {
-  if (userStore.token) {
-    return fetchMyActivities(userStore.token)
-  }
+  async function fetchStats() {
+  return await api<ActivityStats>('/api/activities/stats')
 }
 
   return {
     activities,
     activityTypes,
-    addActivity,
-    deleteActivity,
-    editActivity,
     fetchMyActivities,
+    fetchFriendActivities,
     fetchActivityTypes,
-    refreshActivities
+    createActivity,
+    updateActivity,
+    deleteActivity,
+    clearActivities,
+    fetchStats
   }
 })

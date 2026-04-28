@@ -6,10 +6,11 @@ const router = express.Router()
 
 router.get('/', authenticateToken, getAllActivities)
 router.get('/me', authenticateToken, getMyActivities)
+router.get('/friends', authenticateToken, getFriendActivities)
+router.get('/stats', authenticateToken, getStats)
+
 router.post('/', authenticateToken, createActivity)
 router.put('/:id', authenticateToken, updateActivity)
 router.delete('/:id', authenticateToken, deleteActivity)
-router.get('/friends', authenticateToken, getFriendActivities)
-router.get('/stats', authenticateToken, getStats)
 
 export default router

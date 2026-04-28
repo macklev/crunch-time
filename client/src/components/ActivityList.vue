@@ -1,32 +1,25 @@
 <script setup lang="ts">
-import { useActivityStore } from '@/stores/activityStore';
-import { useUserStore } from '@/stores/userStore';
-import type { Activity } from '@/types';
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue'
+import { useActivityStore } from '@/stores/activityStore'
+import { useUserStore } from '@/stores/userStore'
+import type { Activity } from '@/types'
 
-const activityStore = useActivityStore();
-const userStore = useUserStore();
+const activityStore = useActivityStore()
+const userStore = useUserStore()
 
-const editingId= ref<number | null>(null)
-  const editType= ref('')
-  const editDuration= ref(0)
-  const editDate= ref('')
+const editingId = ref<number | null>(null)
+const editType = ref('')
+const editDuration = ref(0)
+const editDate = ref('')
+const errorMessage = ref('')
 
 const userActivities = computed(() => {
   if (!userStore.currentUser) return []
 
-  return activityStore.activities.filter(activity => activity.userId === userStore.currentUser!.id);
-});
-
-async function deleteActivity(id: number) {
-  const response= await fetch(`http://localhost:3000/api/activities/${id}`, {
-    method: 'DELETE'
-  })
-
-  if (response.ok) {
-    activityStore.deleteActivity(id)
-  }
-}
+  return activityStore.activities.filter(
+    (activity) => activity.userId === userStore.currentUser!.id,
+  )
+})
 
 function startEdit(activity: Activity) {
   editingId.value = activity.id
@@ -43,37 +36,46 @@ function cancelEdit() {
 }
 
 async function saveEdit(activity: Activity) {
-  const updatedActivity = {
-    ...activity,
-    type: editType.value,
-    duration: editDuration.value,
-    date: editDate.value
+  errorMessage.value = ''
+
+  try {
+    await activityStore.updateActivity(activity.id, {
+      type: editType.value,
+      duration: editDuration.value,
+      date: editDate.value,
+    })
+
+    cancelEdit()
+  } catch (err) {
+    console.error('Update activity error:', err)
+    errorMessage.value = 'Could not update activity.'
   }
-
-  const response = await fetch(`http://localhost:3000/api/activities/${activity.id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(updatedActivity)
-  })
-
-  if (!response.ok) {
-    console.error('Failed to update activity')
-    return
-  }
-
-  const savedActivity = await response.json()
-  activityStore.editActivity(savedActivity)
-
-  cancelEdit()
 }
 
+async function deleteActivity(id: number) {
+  errorMessage.value = ''
+
+  try {
+    await activityStore.deleteActivity(id)
+  } catch (err) {
+    console.error('Delete activity error:', err)
+
+    if (err instanceof Error) {
+      errorMessage.value = err.message
+    } else {
+      errorMessage.value = 'Could not delete activity.'
+    }
+  }
+}
 </script>
 
 <template>
   <div class="box">
     <h2 class="title is-4">My Activities</h2>
+
+    <p v-if="errorMessage" class="has-text-danger">
+      {{ errorMessage }}
+    </p>
 
     <p v-if="userActivities.length === 0">
       No activities logged yet.
@@ -82,6 +84,7 @@ async function saveEdit(activity: Activity) {
     <div
       v-for="activity in userActivities"
       :key="activity.id"
+      class="box"
     >
       <div v-if="editingId !== activity.id" class="level">
         <div class="level-left">
@@ -119,42 +122,44 @@ async function saveEdit(activity: Activity) {
         </div>
       </div>
 
-      <div v-else class="box">
+      <div v-else>
         <div class="field">
           <label class="label">Type</label>
           <input
-            class="input"
             v-model="editType"
+            class="input"
+            type="text"
           />
         </div>
 
         <div class="field">
           <label class="label">Duration</label>
           <input
+            v-model.number="editDuration"
             class="input"
             type="number"
-            v-model.number="editDuration"
+            min="1"
           />
         </div>
 
         <div class="field">
           <label class="label">Date</label>
           <input
+            v-model="editDate"
             class="input"
             type="date"
-            v-model="editDate"
           />
         </div>
 
         <button
-          class="button"
+          class="button is-small"
           @click="saveEdit(activity)"
         >
           Save
         </button>
 
         <button
-          class="button is-light"
+          class="button is-small is-light ml-2"
           @click="cancelEdit"
         >
           Cancel
@@ -163,3 +168,6 @@ async function saveEdit(activity: Activity) {
     </div>
   </div>
 </template>
+
+<style scoped>
+</style>

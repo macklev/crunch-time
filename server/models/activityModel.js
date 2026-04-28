@@ -35,14 +35,35 @@ export async function update(id, activity) {
 }
 
 export async function remove(id) {
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('activities')
     .delete()
     .eq('id', id)
 
   if (error) throw error
+}
 
-  return data[0]
+export async function getByUserId(userId) {
+  const { data, error } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('userId', userId)
+
+  if (error) throw error
+
+  return data
+}
+
+export async function getById(id) {
+  const { data, error } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) throw error
+
+  return data
 }
 
 export async function getByUserIds(userIds) {

@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useUserStore } from '@/stores/userStore'
+import { api } from '@/services/api'
 import type { User } from '@/types'
 import ActivityTypeManager from '@/components/ActivityTypeManager.vue'
-
-const userStore = useUserStore()
 
 const users = ref<User[]>([])
 const searchText = ref('')
@@ -13,8 +11,6 @@ const isLoading = ref(false)
 
 const editingUserId = ref<number | null>(null)
 const editUsername = ref('')
-const editGender = ref('')
-const editAge = ref(18)
 const editAdmin = ref(false)
 
 const filteredUsers = computed(() => {
@@ -36,82 +32,75 @@ async function fetchUsers() {
   errorMessage.value = ''
   isLoading.value = true
 
-  const response = await fetch('http://localhost:3000/api/users', {
-    headers: {
-      Authorization: `Bearer ${userStore.token}`
-    }
-  })
-
-  if (!response.ok) {
+  try {
+    users.value = await api<User[]>('/api/users')
+  } catch (error) {
+    console.error('Fetch users error:', error)
     errorMessage.value = 'You are not authorized to view users.'
+  } finally {
     isLoading.value = false
-    return
   }
-
-  users.value = await response.json()
-  isLoading.value = false
 }
 
 function startEdit(user: User) {
   editingUserId.value = user.id
   editUsername.value = user.username
-  editGender.value = user.gender || ''
-  editAge.value = user.age || 18
   editAdmin.value = user.admin
 }
 
 function cancelEdit() {
   editingUserId.value = null
+  editUsername.value = ''
+  editAdmin.value = false
 }
 
 async function saveEdit(userId: number) {
-  const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${userStore.token}`
-    },
-    body: JSON.stringify({
-    username: editUsername.value,
-    admin: editAdmin.value
-    })
-  })
+  errorMessage.value = ''
 
-  if (!response.ok) {
-  const errorText = await response.text()
-  console.error(errorText)
-  errorMessage.value = errorText
-  return
-}
-
-  const updatedUser = await response.json()
-
-  const index = users.value.findIndex((user) => user.id === userId)
-
-  if (index !== -1) {
-    users.value[index] = updatedUser
-  }
-
-  editingUserId.value = null
-}
-
-async function deleteUser(userId: number) {
-  const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${userStore.token}`
-    }
-  })
-
-  if (!response.ok) {
-    errorMessage.value = 'Could not delete user.'
+  if (!editUsername.value.trim()) {
+    errorMessage.value = 'Username cannot be empty.'
     return
   }
 
-  users.value = users.value.filter((user) => user.id !== userId)
+  try {
+    const updatedUser = await api<User>(
+      `/api/users/${userId}`,
+      {
+        username: editUsername.value.trim(),
+        admin: editAdmin.value,
+      },
+      { method: 'PUT' },
+    )
 
-  if (editingUserId.value === userId) {
-    editingUserId.value = null
+    const index = users.value.findIndex((user) => user.id === userId)
+
+    if (index !== -1) {
+      users.value[index] = updatedUser
+    }
+
+    cancelEdit()
+  } catch (error) {
+    console.error('Update user error:', error)
+    errorMessage.value = 'Could not update user.'
+  }
+}
+
+async function deleteUser(userId: number) {
+  errorMessage.value = ''
+
+  try {
+    await api(`/api/users/${userId}`, undefined, {
+      method: 'DELETE',
+    })
+
+    users.value = users.value.filter((user) => user.id !== userId)
+
+    if (editingUserId.value === userId) {
+      cancelEdit()
+    }
+  } catch (error) {
+    console.error('Delete user error:', error)
+    errorMessage.value = 'Could not delete user.'
   }
 }
 
@@ -159,13 +148,19 @@ onMounted(() => {
             </thead>
 
             <tbody>
-              <template v-for="user in filteredUsers" :key="user.id">
+              <template
+                v-for="user in filteredUsers"
+                :key="user.id"
+              >
                 <tr>
                   <td>{{ user.username }}</td>
                   <td>{{ user.id }}</td>
                   <td>{{ user.admin ? 'Yes' : 'No' }}</td>
                   <td>
-                    <button class="button is-small" @click="startEdit(user)">
+                    <button
+                      class="button is-small"
+                      @click="startEdit(user)"
+                    >
                       Edit
                     </button>
                   </td>
@@ -182,7 +177,7 @@ onMounted(() => {
                 <tr v-if="editingUserId === user.id">
                   <td colspan="5">
                     <div class="columns is-multiline">
-                      <div class="column is-4">
+                      <div class="column is-6">
                         <label class="label">Username</label>
                         <input
                           v-model="editUsername"
@@ -191,32 +186,13 @@ onMounted(() => {
                         />
                       </div>
 
-                      <div class="column is-3">
-                        <label class="label">Gender</label>
-                        <div class="select is-fullwidth">
-                          <select v-model="editGender">
-                            <option value="">Not specified</option>
-                            <option value="female">female</option>
-                            <option value="male">male</option>
-                            <option value="other">other</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="column is-2">
-                        <label class="label">Age</label>
-                        <input
-                          v-model.number="editAge"
-                          class="input"
-                          type="number"
-                          min="1"
-                        />
-                      </div>
-
-                      <div class="column is-3">
+                      <div class="column is-6">
                         <label class="label">Admin</label>
                         <label class="checkbox">
-                          <input v-model="editAdmin" type="checkbox" />
+                          <input
+                            v-model="editAdmin"
+                            type="checkbox"
+                          />
                           Is admin
                         </label>
                       </div>
@@ -248,8 +224,9 @@ onMounted(() => {
           No users found.
         </p>
       </div>
+
+      <ActivityTypeManager />
     </div>
-    <ActivityTypeManager />
   </section>
 </template>
 

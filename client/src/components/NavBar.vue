@@ -79,10 +79,6 @@ function logout() {
           </a>
 
           <div class="navbar-dropdown is-right">
-            <RouterLink to="/profile" class="navbar-item">
-              Profile
-            </RouterLink>
-
             <a class="navbar-item" @click="logout">
               Logout
             </a>

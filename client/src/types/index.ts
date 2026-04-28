@@ -23,3 +23,20 @@ export type ActivityType = {
   calories_per_hour: number
   description?: string
 }
+
+export type ActivityStats = {
+  totalActivities: number
+  totalMinutes: number
+  totalCalories: number
+  averageDuration: number
+  mostCommonActivity: string
+}
+
+export type Message = {
+  id: number
+  userId: number
+  text: string
+  created_at: string
+  read: boolean
+}
+

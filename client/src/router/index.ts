@@ -31,9 +31,9 @@ const router = createRouter({
       component: () => import('../views/MoreStatsView.vue'),
     },
     {
-  path: '/auth/callback',
-  name: 'auth-callback',
-  component: () => import('@/views/AuthCallbackView.vue'),
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: () => import('@/views/AuthCallbackView.vue'),
     }
   ],
 })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ActivityForm from '@/components/ActivityForm.vue';
 import ActivityList from '@/components/ActivityList.vue';
+import MessageList from '@/components/MessageList.vue';
 import { useUserStore } from '@/stores/userStore';
 
 const userStore = useUserStore();
@@ -12,6 +13,7 @@ const userStore = useUserStore();
     <h2 class="subtitle">Your Fitness, Connected</h2>
     <main>
       <h1>Welcome back, {{ userStore.currentUser?.username }} </h1>
+      <MessageList />
       <ActivityList />
       <ActivityForm />
     </main>

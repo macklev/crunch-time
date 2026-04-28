@@ -51,14 +51,16 @@ export async function updateActivity(req, res) {
 
 export async function deleteActivity(req, res) {
   try {
-    const id= Number(req.params.id)
+    const id = Number(req.params.id)
+
     const activity = await activityModel.getById(id)
 
-    if(activity.userId !== req.user.id) {
-      return res.status(403).json({ error: 'Unauthorized' })
+    if (activity.userId !== req.user.id) {
+      return res.status(403).json({ error: 'Not authorized' })
     }
 
     await activityModel.remove(id)
+
     res.json({ message: 'Activity deleted' })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -72,8 +74,8 @@ export async function getFriendActivities(req, res) {
     const friendIds = user.friends || []
 
     if (friendIds.length === 0) {
-      return res.json([])
-    }
+        return res.json([])
+    }   
 
     const activities = await activityModel.getByUserIds(friendIds)
 
