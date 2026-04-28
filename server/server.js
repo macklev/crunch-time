@@ -15,9 +15,8 @@ app.use(express.json())
 app.use(cors())
 
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: process.env.CLIENT_URL,
+  credentials: true
 }))
 
 app.use('/api/users', userRoutes)
