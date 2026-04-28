@@ -3,9 +3,10 @@ import { RouterLink } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 
 const userStore = useUserStore()
+const API_ROOT = import.meta.env.VITE_API_ROOT
 
 function loginWithGoogle() {
-  window.location.href = 'http://localhost:3000/api/auth/google'
+  window.location.href = `${API_ROOT}/api/auth/google`
 }
 
 function logout() {
