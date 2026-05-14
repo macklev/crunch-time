@@ -22,9 +22,10 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 
 const friends = computed(() => userStore.currentUser?.friends || [])
+const hasLoadedOnce = ref(false)
 
 function hasMore() {
-  return friendActivities.value.length < total.value
+  return !hasLoadedOnce.value || friendActivities.value.length < total.value
 }
 
 async function loadMoreFriendActivities() {
