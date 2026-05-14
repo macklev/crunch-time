@@ -33,6 +33,7 @@ async function loadMoreFriendActivities() {
 
   errorMessage.value = ''
   isLoading.value = true
+  hasLoadedOnce.value = true
 
   try {
     const result = await activityStore.fetchFriendActivitiesPage(page.value, limit)
@@ -40,6 +41,7 @@ async function loadMoreFriendActivities() {
     friendActivities.value.push(...result.items)
     total.value = result.total
     page.value++
+    hasLoadedOnce.value = true
   } catch (error) {
     console.error('Friend activity error:', error)
     errorMessage.value = 'Could not load friend activity.'
@@ -52,6 +54,7 @@ async function resetFriendActivityFeed() {
   friendActivities.value = []
   page.value = 0
   total.value = 0
+  hasLoadedOnce.value = false
 
   reset()
 
