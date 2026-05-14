@@ -236,11 +236,15 @@ const { reset } = useInfiniteScroll(
           </div>
 
           <div v-if="isLoading && hasMore()" class="box">
-            Loading more activities...
+            <div class="skeleton-lines">
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
           </div>
 
           <p v-if="hasLoadedOnce && !hasMore() && friendActivities.length > 0">
-          You have reached the end.
+            You have reached the end.
           </p>
         </div>
       </div>
