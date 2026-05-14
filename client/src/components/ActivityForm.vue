@@ -11,6 +11,17 @@ const duration = ref(0)
 const date = ref('')
 const errorMessage = ref('')
 const isSaving = ref(false)
+const isSeeding = ref(false)
+
+function formatDate(daysAgo: number) {
+  const dateValue = new Date()
+  dateValue.setDate(dateValue.getDate() - daysAgo)
+  return dateValue.toISOString().slice(0, 10)
+}
+
+function getRandomInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
 
 async function submitActivity() {
   errorMessage.value = ''
@@ -56,6 +67,53 @@ async function submitActivity() {
     errorMessage.value = 'Could not save activity.'
   } finally {
     isSaving.value = false
+  }
+}
+
+async function addRandomActivities() {
+  errorMessage.value = ''
+
+  if (!userStore.token || !userStore.currentUser) {
+    errorMessage.value = 'You must be logged in to log activities.'
+    return
+  }
+
+  if (!activityStore.activityTypes.length) {
+    errorMessage.value = 'Activity types must be loaded before seeding data.'
+    return
+  }
+
+  try {
+    isSeeding.value = true
+
+    const seedCount = 100
+
+    for (let index = 0; index < seedCount; index += 1) {
+      const activityType = activityStore.activityTypes[
+        getRandomInt(0, activityStore.activityTypes.length - 1)
+      ]
+
+      if (!activityType) {
+        throw new Error('No activity type available.')
+      }
+
+      const durationValue = getRandomInt(10, 180)
+      const caloriesBurned = Math.round(
+        (activityType.calories_per_hour / 60) * durationValue,
+      )
+
+      await activityStore.createActivity({
+        type: activityType.name,
+        duration: durationValue,
+        caloriesBurned,
+        date: formatDate(getRandomInt(0, 30)),
+      })
+    }
+  } catch (error) {
+    console.error('Seed activities error:', error)
+    errorMessage.value = 'Could not generate random activities.'
+  } finally {
+    isSeeding.value = false
   }
 }
 </script>
@@ -113,13 +171,23 @@ async function submitActivity() {
 
     <div class="field">
       <div class="control">
-        <button
-          class="button"
-          :disabled="isSaving"
-          @click="submitActivity"
-        >
-          {{ isSaving ? 'Saving...' : 'Submit Activity' }}
-        </button>
+        <div class="buttons">
+          <button
+            class="button is-primary"
+            :disabled="isSaving || isSeeding"
+            @click="submitActivity"
+          >
+            {{ isSaving ? 'Saving...' : 'Submit Activity' }}
+          </button>
+
+          <button
+            class="button is-light"
+            :disabled="isSaving || isSeeding"
+            @click="addRandomActivities"
+          >
+            {{ isSeeding ? 'Generating...' : 'Add 100 Random Activities' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

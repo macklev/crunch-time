@@ -4,8 +4,11 @@ import { useActivityStore } from '@/stores/activityStore'
 import { useUserStore } from '@/stores/userStore'
 import type { Activity, User } from '@/types'
 
+
 const activityStore = useActivityStore()
 const userStore = useUserStore()
+
+
 
 const friendActivities = ref<Activity[]>([])
 const searchedUsers = ref<User[]>([])

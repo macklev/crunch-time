@@ -125,3 +125,30 @@ export async function getStats(req, res) {
     res.status(500).json({ error: err.message })
   }
 }
+
+export async function getFriendActivitiesPage(req, res) {
+  try {
+    const page = Number(req.query.page) || 0
+    const limit = Number(req.query.limit) || 5
+
+    const user = await userModel.getById(req.user.id)
+    const friendIds = user.friends || []
+
+    if (friendIds.length === 0) {
+      return res.json({
+        items: [],
+        total: 0,
+      })
+    }
+
+    const result = await activityModel.getFriendActivitiesPage(
+      friendIds,
+      page,
+      limit,
+    )
+
+    res.json(result)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
