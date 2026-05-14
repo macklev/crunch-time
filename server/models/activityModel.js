@@ -83,7 +83,13 @@ export async function getFriendActivitiesPage(friendIds, page, limit) {
 
   const { data, error, count } = await supabase
     .from('activities')
-    .select('*', { count: 'exact' })
+    .select(`
+      *,
+      users (
+        id,
+        username
+      )
+    `, { count: 'exact' })
     .in('userId', friendIds)
     .order('date', { ascending: false })
     .range(from, to)
