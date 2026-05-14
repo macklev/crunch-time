@@ -235,12 +235,12 @@ const { reset } = useInfiniteScroll(
             <p>{{ activity.date }}</p>
           </div>
 
-          <div v-if="isLoading" class="box">
+          <div v-if="isLoading && hasMore()" class="box">
             Loading more activities...
           </div>
 
-          <p v-if="!hasMore() && friendActivities.length > 0">
-            You have reached the end.
+          <p v-if="hasLoadedOnce && !hasMore() && friendActivities.length > 0">
+          You have reached the end.
           </p>
         </div>
       </div>
