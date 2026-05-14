@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllActivities, createActivity, deleteActivity, updateActivity, getMyActivities, getFriendActivities, getStats } from '../controllers/activityController.js'
+import { getAllActivities, createActivity, deleteActivity, updateActivity, getMyActivities, getFriendActivities, getStats, getFriendActivitiesPage } from '../controllers/activityController.js'
 import { authenticateToken } from '../middleware/auth.js'
 
 const router = express.Router()
