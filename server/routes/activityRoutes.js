@@ -7,6 +7,7 @@ const router = express.Router()
 router.get('/', authenticateToken, getAllActivities)
 router.get('/me', authenticateToken, getMyActivities)
 router.get('/friends', authenticateToken, getFriendActivities)
+router.get('/friends/page', authenticateToken, getFriendActivitiesPage)
 router.get('/stats', authenticateToken, getStats)
 
 router.post('/', authenticateToken, createActivity)

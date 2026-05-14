@@ -62,6 +62,13 @@ export const useActivityStore = defineStore('activity', () => {
   return await api<ActivityStats>('/api/activities/stats')
 }
 
+async function fetchFriendActivitiesPage(page: number, limit: number) {
+  return await api<{
+    items: Activity[]
+    total: number
+  }>(`/api/activities/friends/page?page=${page}&limit=${limit}`)
+}
+
   return {
     activities,
     activityTypes,
@@ -72,6 +79,7 @@ export const useActivityStore = defineStore('activity', () => {
     updateActivity,
     deleteActivity,
     clearActivities,
-    fetchStats
+    fetchStats,
+    fetchFriendActivitiesPage
   }
 })

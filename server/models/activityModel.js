@@ -76,3 +76,22 @@ export async function getByUserIds(userIds) {
 
   return data
 }
+
+export async function getFriendActivitiesPage(friendIds, page, limit) {
+  const from = page * limit
+  const to = from + limit - 1
+
+  const { data, error, count } = await supabase
+    .from('activities')
+    .select('*', { count: 'exact' })
+    .in('userId', friendIds)
+    .order('date', { ascending: false })
+    .range(from, to)
+
+  if (error) throw error
+
+  return {
+    items: data,
+    total: count,
+  }
+}
