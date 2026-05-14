@@ -15,6 +15,11 @@ export type Activity = {
   duration: number
   type: string
   caloriesBurned: number
+  users?: {
+    id: number
+    username: string
+    profilePicture: string
+  }
 }
 
 export type ActivityType = {
